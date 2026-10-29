@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>미술과 시험실 찾기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: single centered search column, Google-start-page simplicity; result card appears under the box */
+:root{
+  --bg:#ffffff; --fg:#1f2329; --muted:#6b7280; --line:#dfe1e5; --surface:#f6f7f9;
+  --accent:#1d4ed8; --accent-soft:#e8efff; --warn:#b42318;
+  --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --shadow:0 1px 6px rgba(32,33,36,.18);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17191c;--fg:#e8eaed;--muted:#9aa0a6;--line:#3c4043;--surface:#202326;--accent:#8ab4f8;--accent-soft:#1f2a3d;--warn:#f28b82;--shadow:0 1px 6px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17191c;--fg:#e8eaed;--muted:#9aa0a6;--line:#3c4043;--surface:#202326;--accent:#8ab4f8;--accent-soft:#1f2a3d;--warn:#f28b82;--shadow:0 1px 6px rgba(0,0,0,.5);color-scheme:dark}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+main{max-width:620px;margin:0 auto;padding-block:12vh 48px;display:flex;flex-direction:column;gap:22px}
+.brand{text-align:center;display:flex;flex-direction:column;gap:6px}
+.brand .eyebrow{font-size:13px;color:var(--muted);letter-spacing:.02em}
+.brand h1{margin:0;font-size:clamp(26px,6vw,34px);font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.brand h1 span{color:var(--accent)}
+form{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--bg);min-height:52px;padding-inline:18px 6px;gap:8px;transition:box-shadow .15s}
+form:hover,form:focus-within{box-shadow:var(--shadow);border-color:transparent}
+.ico{flex:none;width:20px;height:20px;color:var(--muted)}
+input{border:0;outline:0;background:transparent;color:var(--fg);font:inherit;font-size:16px;min-width:0;padding-block:12px}
+#q-name{flex:1.2}
+#q-school{flex:1;border-left:1px solid var(--line);padding-left:12px}
+input::placeholder{color:var(--muted)}
+button{font:inherit;cursor:pointer}
+.go{flex:none;border:0;background:var(--accent);color:var(--bg);border-radius:999px;padding:9px 16px 9px 13px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.go svg{width:17px;height:17px}
+.ko{color:var(--muted);font-size:14px}
+.foreign{display:flex;flex-direction:column;gap:8px}
+.foreign .item{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.foreign .item b{font-size:15px;letter-spacing:.02em}
+.foreign .item .sub{color:var(--muted);font-size:13px}
+.foreign .item .rt{grid-row:1 / span 2;grid-column:2;text-align:right;font-size:13px;color:var(--muted)}
+.foreign .item .rt strong{display:block;color:var(--accent);font-size:16px}
+.foreign .item .rt span{font-variant-numeric:tabular-nums}
+.go:focus-visible,.clear:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{text-align:center;color:var(--muted);font-size:13px;margin:-8px 0 0}
+#results{display:flex;flex-direction:column;gap:12px}
+.card{border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;background:var(--bg)}
+.card .room{font-size:26px;font-weight:700;color:var(--accent);line-height:1.2}
+.card .place{color:var(--muted);font-size:14px}
+.card .no{grid-row:1 / span 2;grid-column:2;text-align:right}
+.card .no b{display:block;font-size:30px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.card .no small{color:var(--muted);font-size:12px;letter-spacing:.06em}
+.card .who{grid-column:1 / -1;border-top:1px dashed var(--line);padding-top:10px;margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:15px}
+.card .who .school{color:var(--muted)}
+.empty{text-align:center;padding:22px;border-radius:16px;background:var(--surface);color:var(--fg);line-height:1.6}
+.empty strong{color:var(--warn)}
+.count{color:var(--muted);font-size:13px}
+.rooms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.rooms div{background:var(--surface);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5}
+.rooms b{display:block;font-size:14px}
+.rooms span{color:var(--muted);font-variant-numeric:tabular-nums}
+footer{text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
+@media (max-width:480px){
+  form{flex-wrap:wrap;border-radius:20px;padding:6px 6px 6px 14px}
+  #q-name{flex:1 1 60%}
+  #q-school{flex:1 1 100%;border-left:0;border-top:1px solid var(--line);padding-left:30px;order:3}
+  .go{order:2}
+  .rooms{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card .room{font-size:22px}.card .no b{font-size:26px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<main>
+  <header class="brand">
+    <div class="eyebrow">2027학년도 충남예술고등학교 신입생 입학전형 · 10. 30.(금)</div>
+    <h1>미술과 <span>시험실</span> 찾기</h1>
+  </header>
+
+  <form id="f" autocomplete="off" role="search">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q-name" type="search" placeholder="수험생 이름" aria-label="수험생 이름" inputmode="text">
+    <input id="q-school" type="search" placeholder="출신 중학교 (선택)" aria-label="출신 중학교">
+    <button class="go" type="submit" aria-label="검색"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>검색</span></button>
+  </form>
+  <p class="hint">이름을 입력하세요. 외국인은 원어·한글 발음 모두 됩니다. 동명이인은 출신 중학교로 구분합니다.</p>
+
+  <section id="results" aria-live="polite"></section>
+
+  <section>
+    <div class="count">시험실 안내 · 응시 90명</div>
+    <div class="rooms" id="rooms"></div>
+  </section>
+
+  <section class="foreign">
+    <div class="count">외국인 수험생 · 원어(한국어 발음)</div>
+    <div id="foreign"></div>
+  </section>
+
+  <footer>실기고사 09:00~12:30 · 확인이 어려우면 복도 감독 선생님께 문의하세요.</footer>
+</main>
+
+<script>
+const ROOMS={1:["드로잉1실","미술1동 2층"],2:["드로잉2실","미술1동 2층"],3:["드로잉3실","미술1동 2층"],4:["서양화1실","미술2동 3층"],5:["서양화2실","미술2동 3층"],6:["서양화3실","미술2동 3층"]};
+const ALIAS={"2001":"리 빅토리아","2002":"시우이 타티아나"};
+const DATA=[["2001","LI VIKTORIIA","아산테크노중학교",1],["2002","SIUI TATIANA","신창중학교",1],["2003","국서율","아름중학교",1],["2004","권윤서","천안오성중학교",1],["2005","권하율","남산중학교",1],["2006","권효림","엄사중학교",1],["2007","김가온","비전중학교",1],["2008","김강우","안일중학교",1],["2009","김나윤","음봉중학교",1],["2010","김동인","검정고시",1],["2011","김루하","한백중학교",1],["2012","김민관","서원중학교",1],["2013","김민영","서전중학교",1],["2014","김민채","두루중학교",1],["2015","김서연","서전중학교",1],["2016","김선호","진천중학교",1],["2017","김수은","양지중학교",2],["2018","김승혁","다정중학교",2],["2019","김신영","양지중학교",2],["2020","김우진","천안동중학교",2],["2021","김윤주","한내여자중학교",2],["2022","김율희","논산여자중학교",2],["2023","김지윤A","천안용곡중학교",2],["2024","김지윤B","아름중학교",2],["2025","김칸희","용이중학교",2],["2026","김태윤","천안새샘중학교",2],["2027","김하늘","음암중학교",2],["2028","도윤슬","각리중학교",2],["2029","박선화","대천여자중학교",2],["2030","박소혜","천안오성중학교",2],["2031","박지성","천안용곡중학교",2],["2032","배소율","다정중학교",2],["2033","배유나","아름중학교",3],["2034","백나현","온양용화중학교",3],["2035","서호준","각리중학교",3],["2036","성혜린","천안성성중학교",3],["2037","손유이","양지중학교",3],["2038","신지혜","천안월봉중학교",3],["2039","안서영","충주대소원중학교",3],["2040","안채린","종촌중학교",3],["2041","양예서","용이중학교",3],["2042","양희율","천안가람중학교",3],["2043","연은재","각리중학교",3],["2044","염정연","서령중학교",3],["2045","오현서","논산여자중학교",3],["2046","원설현","진천중학교",3],["2047","원소윤","평택화양중학교",3],["2048","원지혜","종촌중학교",3],["2049","유의령","두루중학교",4],["2050","유지아","서원중학교",4],["2051","윤서아","논산여자중학교",4],["2052","윤시하","환서중학교",4],["2053","이고은","남성중학교",4],["2054","이다경","현화중학교",4],["2055","이설","검정고시",4],["2056","이승제","아산중학교",4],["2057","이승후","천성중학교",4],["2058","이정은","공주여자중학교",4],["2059","이지우","천안월봉중학교",4],["2060","이지항","진천중학교",4],["2061","이진희","진천여자중학교",4],["2062","이창하","홍주중학교",4],["2063","이채은","평택여자중학교",4],["2064","이하윤","세마중학교",4],["2065","임도헌","아름중학교",5],["2066","장여울","아산테크노중학교",5],["2067","장연주","서산여자중학교",5],["2068","장준우","진천중학교",5],["2069","정가을","천안불당중학교",5],["2070","정규빈","광일중학교",5],["2071","정나연","솔강중학교",5],["2072","정시안","금곡중학교",5],["2073","정윤지","천안성정중학교",5],["2074","정지율","천안가온중학교",5],["2075","정현우","모종중학교",5],["2076","조성아","종촌중학교",5],["2077","조은별","문시중학교",5],["2078","조은지","청옥중학교",5],["2079","조인영","예당중학교",5],["2080","주은비","종촌중학교",5],["2081","차연우","구갈중학교",5],["2082","최유림","양청중학교",5],["2083","최하영A","한내여자중학교",6],["2084","최하영B","팔봉중학교",6],["2085","최현진","천안가람중학교",6],["2086","편규리","청옥중학교",6],["2087","한준우","고운중학교",6],["2088","한효주","두루중학교",6],["2089","홍서율","각리중학교",6],["2090","황다미","천안두정중학교",6]];
+const norm=s=>(s||"").toLowerCase().replace(/\s+/g,"");
+const baseName=n=>n.replace(/^([가-힣]+)[A-Z]$/,"$1");
+const schoolKey=s=>norm(s).replace(/(중학교|중)$/,"");
+const list=DATA.map(([no,name,school,room])=>({no,name:baseName(name),school,room,ko:ALIAS[no]||"",nk:norm(baseName(name))+"|"+norm(ALIAS[no]||""),sk:norm(school)}));
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function search(){
+  const n=norm($("q-name").value), s=schoolKey($("q-school").value), out=$("results");
+  if(!n && !s){out.innerHTML="";return}
+  let hits=list.filter(r=>(!n||r.nk.includes(n))&&(!s||r.sk.includes(s)));
+  const exact=hits.filter(r=>r.nk.split("|").includes(n)); if(n && exact.length) hits=exact;
+  if(!hits.length){
+    out.innerHTML=`<div class="empty"><strong>찾는 수험생이 없습니다.</strong><br>이름 철자를 확인하거나 출신 중학교를 지우고 다시 검색하세요.<br>계속 찾을 수 없으면 복도 감독 선생님께 문의하세요.</div>`;return;
+  }
+  if(hits.length>8 && n.length<2){out.innerHTML=`<div class="empty">이름을 두 글자 이상 입력하세요.</div>`;return}
+  out.innerHTML=(hits.length>1?`<div class="count">${hits.length}명 검색됨 · 출신 중학교를 확인하세요</div>`:"")+
+    hits.slice(0,12).map(r=>`<article class="card">
+      <div class="room">제${r.room}시험실</div>
+      <div class="no"><small>수험번호</small><b>${esc(r.no)}</b></div>
+      <div class="place">${ROOMS[r.room][0]} · ${ROOMS[r.room][1]}</div>
+      <div class="who"><span>${esc(r.name)}${r.ko?` <span class="ko">(${esc(r.ko)})</span>`:""}</span><span class="school">${esc(r.school)}</span></div>
+    </article>`).join("");
+}
+$("f").addEventListener("submit",e=>{e.preventDefault();search()});
+["q-name","q-school"].forEach(id=>$(id).addEventListener("input",search));
+
+const ranges={};list.forEach(r=>{const g=ranges[r.room]||(ranges[r.room]=[r.no,r.no,0]);g[0]=g[0]<r.no?g[0]:r.no;g[1]=g[1]>r.no?g[1]:r.no;g[2]++});
+$("rooms").innerHTML=Object.keys(ROOMS).map(k=>`<div><b>제${k}시험실</b>${ROOMS[k][0]} · ${ROOMS[k][1]}<br><span>${ranges[k][0]}~${ranges[k][1]} · ${ranges[k][2]}명</span></div>`).join("");
+$("foreign").innerHTML=list.filter(r=>r.ko).map(r=>`<div class="item"><b>${esc(r.name)}</b><div class="rt"><strong>제${r.room}시험실</strong><span>수험번호 ${esc(r.no)}</span></div><div class="sub">${esc(r.ko)} · ${esc(r.school)} · ${ROOMS[r.room][0]}</div></div>`).join("");
+$("foreign").style.display="flex";$("foreign").style.flexDirection="column";$("foreign").style.gap="8px";
+</script>
+
+</body>
+</html>
